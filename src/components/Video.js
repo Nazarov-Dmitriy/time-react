@@ -4,36 +4,29 @@ import "moment/locale/ru";
 moment.locale("ru");
 
 export default function Video(props) {
-  function withData() {
-    return function (Component) {
-      const Func = function (props) {
-        const [dataTime, setDataTime] = useState(null);
+  function withHOC(Component) {
+    return function Wrapper(props) {
+      const [dataTime, setDataTime] = useState(null);
 
-        useEffect(() => {
-          let event = moment(props.date.date);
-          setDataTime(event.startOf('hour').fromNow());
-        }, [props]);
-
-        return <Component data={dataTime} />;
-      };
+      useEffect(() => {
+        let event = moment(props.date.date);
+        setDataTime(event.startOf("hour").fromNow());
+      }, [props]);
 
       const componentName =
         Component.displayName || Component.name || "Component";
-      Func.displayName = `WithData${componentName}`;
+      Wrapper.displayName = `withHOC${componentName}`;
 
-      return Func;
+      return <Component data={dataTime} />;
     };
   }
 
-  function DateTime(...props) {
-    console.log(props);
 
-    return <p className="date">{props[0].data}</p>;
+  function DateTime(...props) {
+    return <p className="date"> {props[0].data} </p>;
   }
 
-  const userDataDecorator = withData();
-
-  const DateTimePretty = userDataDecorator(DateTime);
+  const DateTimePretty = withHOC(DateTime);
 
   return (
     <div className="video">
@@ -43,13 +36,8 @@ export default function Video(props) {
         frameBorder="0"
         allow="autoplay; encrypted-media"
         allowFullScreen
-      ></iframe>
-      {/* <DateTime date={props.date} /> */}
-      <DateTimePretty date={props} />
+      ></iframe>{" "}
+      <DateTimePretty date={props} />{" "}
     </div>
   );
 }
-
-// Используя HOC обернуть DateTime в компонент DateTimePretty, так, чтобы он преобразовывал дату к нужному виду.
-
-// Воспользуйтесь готовым файлом App.js и стилями css/index.css из данного каталога в качестве отправной точки (замените ими те, что создаются в create-react-app).
